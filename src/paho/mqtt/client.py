@@ -1486,7 +1486,7 @@ class Client(object):
                         try:
                             self.on_disconnect(self, self._userdata, rc)
                         except Exception as err:
-                            self._easy_log(MQTT_LOG_ERR, 'Caught exception in on_disconnect: %s', err)
+                            self._easy_log(MQTT_LOG_ERR, '%s: Caught exception in on_disconnect: %s', self._client_id, err)
 
             return MQTT_ERR_CONN_LOST
 
@@ -1604,7 +1604,7 @@ class Client(object):
                 except (socket.error, OSError, WebsocketConnectionError):
                     if not retry_first_connection:
                         raise
-                    self._easy_log(MQTT_LOG_DEBUG, "Connection failed, retrying")
+                    self._easy_log(MQTT_LOG_DEBUG, "%s: Connection failed, retrying", self._client_id)
                     self._reconnect_wait()
             else:
                 break
@@ -1880,7 +1880,7 @@ class Client(object):
                     try:
                         self.on_socket_open(self, self._userdata, self._sock)
                     except Exception as err:
-                        self._easy_log(MQTT_LOG_ERR, 'Caught exception in on_socket_open: %s', err)
+                        self._easy_log(MQTT_LOG_ERR, '%s: Caught exception in on_socket_open: %s', self._client_id, err)
 
     @property
     def on_socket_close(self):
@@ -1911,7 +1911,7 @@ class Client(object):
                     try:
                         self.on_socket_close(self, self._userdata, sock)
                     except Exception as err:
-                        self._easy_log(MQTT_LOG_ERR, 'Caught exception in on_socket_close: %s', err)
+                        self._easy_log(MQTT_LOG_ERR, '%s: Caught exception in on_socket_close: %s', self._client_id, err)
 
     @property
     def on_socket_register_write(self):
@@ -1944,7 +1944,7 @@ class Client(object):
                 try:
                     self.on_socket_register_write(self, self._userdata, self._sock)
                 except Exception as err:
-                    self._easy_log(MQTT_LOG_ERR, 'Caught exception in on_socket_register_write: %s', err)
+                    self._easy_log(MQTT_LOG_ERR, '%s: Caught exception in on_socket_register_write: %s', self._client_id, err)
 
     @property
     def on_socket_unregister_write(self):
@@ -1979,7 +1979,7 @@ class Client(object):
                 try:
                     self.on_socket_unregister_write(self, self._userdata, sock)
                 except Exception as err:
-                    self._easy_log(MQTT_LOG_ERR, 'Caught exception in on_socket_unregister_write: %s', err)
+                    self._easy_log(MQTT_LOG_ERR, '%s: Caught exception in on_socket_unregister_write: %s', self._client_id, err)
 
     def message_callback_add(self, sub, callback):
         """Register a message callback for a specific topic.
@@ -2027,7 +2027,7 @@ class Client(object):
                         try:
                             self.on_disconnect(self, self._userdata, rc)
                         except Exception as err:
-                            self._easy_log(MQTT_LOG_ERR, 'Caught exception in on_disconnect: %s', err)
+                            self._easy_log(MQTT_LOG_ERR, '%s: Caught exception in on_disconnect: %s', self._client_id, err)
         return rc
 
     def _packet_read(self):
@@ -2050,7 +2050,7 @@ class Client(object):
             except WouldBlockError:
                 return MQTT_ERR_AGAIN
             except socket.error as err:
-                self._easy_log(MQTT_LOG_ERR, 'failed to receive on socket: %s', err)
+                self._easy_log(MQTT_LOG_ERR, '%s: failed to receive on socket: %s', self._client_id, err)
                 return 1
             else:
                 if len(command) == 0:
@@ -2068,7 +2068,7 @@ class Client(object):
                 except WouldBlockError:
                     return MQTT_ERR_AGAIN
                 except socket.error as err:
-                    self._easy_log(MQTT_LOG_ERR, 'failed to receive on socket: %s', err)
+                    self._easy_log(MQTT_LOG_ERR, '%s: failed to receive on socket: %s', self._client_id, err)
                     return 1
                 else:
                     if len(byte) == 0:
@@ -2095,7 +2095,7 @@ class Client(object):
             except WouldBlockError:
                 return MQTT_ERR_AGAIN
             except socket.error as err:
-                self._easy_log(MQTT_LOG_ERR, 'failed to receive on socket: %s', err)
+                self._easy_log(MQTT_LOG_ERR, '%s: failed to receive on socket: %s', self._client_id, err)
                 return 1
             else:
                 if len(data) == 0:
@@ -2138,7 +2138,7 @@ class Client(object):
                 return MQTT_ERR_AGAIN
             except socket.error as err:
                 self._current_out_packet_mutex.release()
-                self._easy_log(MQTT_LOG_ERR, 'failed to receive on socket: %s', err)
+                self._easy_log(MQTT_LOG_ERR, '%s: failed to receive on socket: %s', self._client_id, err)
                 return 1
 
             if write_length > 0:
@@ -2153,7 +2153,7 @@ class Client(object):
                                     try:
                                         self.on_publish(self, self._userdata, packet['mid'])
                                     except Exception as err:
-                                        self._easy_log(MQTT_LOG_ERR, 'Caught exception in on_publish: %s', err)
+                                        self._easy_log(MQTT_LOG_ERR, '%s: Caught exception in on_publish: %s', self._client_id, err)
 
                         packet['info']._set_as_published()
 
@@ -2169,7 +2169,7 @@ class Client(object):
                                     try:
                                         self.on_disconnect(self, self._userdata, 0)
                                     except Exception as err:
-                                        self._easy_log(MQTT_LOG_ERR, 'Caught exception in on_disconnect: %s', err)
+                                        self._easy_log(MQTT_LOG_ERR, '%s: Caught exception in on_disconnect: %s', self._client_id, err)
 
                         self._sock_close()
                         return MQTT_ERR_SUCCESS
@@ -2230,7 +2230,7 @@ class Client(object):
                             try:
                                 self.on_disconnect(self, self._userdata, rc)
                             except Exception as err:
-                                self._easy_log(MQTT_LOG_ERR, 'Caught exception in on_disconnect: %s', err)
+                                self._easy_log(MQTT_LOG_ERR, '%s: Caught exception in on_disconnect: %s', self._client_id, err)
 
     def _mid_generate(self):
         with self._mid_generate_mutex:
@@ -2259,22 +2259,22 @@ class Client(object):
             return MQTT_ERR_SUCCESS
 
     def _send_pingreq(self):
-        self._easy_log(MQTT_LOG_DEBUG, "Sending PINGREQ")
+        self._easy_log(MQTT_LOG_DEBUG, "%s: Sending PINGREQ", self._client_id)
         rc = self._send_simple_command(PINGREQ)
         if rc == MQTT_ERR_SUCCESS:
             self._ping_t = time_func()
         return rc
 
     def _send_pingresp(self):
-        self._easy_log(MQTT_LOG_DEBUG, "Sending PINGRESP")
+        self._easy_log(MQTT_LOG_DEBUG, "%s: Sending PINGRESP", self._client_id)
         return self._send_simple_command(PINGRESP)
 
     def _send_puback(self, mid):
-        self._easy_log(MQTT_LOG_DEBUG, "Sending PUBACK (Mid: %d)", mid)
+        self._easy_log(MQTT_LOG_DEBUG, "%s: Sending PUBACK (Mid: %d)", self._client_id, mid)
         return self._send_command_with_mid(PUBACK, mid, False)
 
     def _send_pubcomp(self, mid):
-        self._easy_log(MQTT_LOG_DEBUG, "Sending PUBCOMP (Mid: %d)", mid)
+        self._easy_log(MQTT_LOG_DEBUG, "%s: Sending PUBCOMP (Mid: %d)", self._client_id, mid)
         return self._send_command_with_mid(PUBCOMP, mid, False)
 
     def _pack_remaining_length(self, packet, remaining_length):
@@ -2315,14 +2315,14 @@ class Client(object):
         if payloadlen == 0:
             self._easy_log(
                 MQTT_LOG_DEBUG,
-                "Sending PUBLISH (d%d, q%d, r%d, m%d), '%s' (NULL payload)",
-                dup, qos, retain, mid, topic
+                "%s: Sending PUBLISH (d%d, q%d, r%d, m%d), '%s' (NULL payload)",
+                self._client_id, dup, qos, retain, mid, topic
             )
         else:
             self._easy_log(
                 MQTT_LOG_DEBUG,
-                "Sending PUBLISH (d%d, q%d, r%d, m%d), '%s', ... (%d bytes)",
-                dup, qos, retain, mid, topic, payloadlen
+                "%s: Sending PUBLISH (d%d, q%d, r%d, m%d), '%s', ... (%d bytes)",
+                self._client_id, dup, qos, retain, mid, topic, payloadlen
             )
 
         if qos > 0:
@@ -2341,11 +2341,11 @@ class Client(object):
         return self._packet_queue(PUBLISH, packet, mid, qos, info)
 
     def _send_pubrec(self, mid):
-        self._easy_log(MQTT_LOG_DEBUG, "Sending PUBREC (Mid: %d)", mid)
+        self._easy_log(MQTT_LOG_DEBUG, "%s: Sending PUBREC (Mid: %d)", self._client_id, mid)
         return self._send_command_with_mid(PUBREC, mid, False)
 
     def _send_pubrel(self, mid):
-        self._easy_log(MQTT_LOG_DEBUG, "Sending PUBREL (Mid: %d)", mid)
+        self._easy_log(MQTT_LOG_DEBUG, "%s: Sending PUBREL (Mid: %d)", self._client_id, mid)
         return self._send_command_with_mid(PUBREL | 2, mid, False)
 
     def _send_command_with_mid(self, command, mid, dup):
@@ -2412,20 +2412,20 @@ class Client(object):
         self._keepalive = keepalive
         self._easy_log(
             MQTT_LOG_DEBUG,
-            "Sending CONNECT (u%d, p%d, wr%d, wq%d, wf%d, c%d, k%d) client_id=%s",
+            "%s: Sending CONNECT (u%d, p%d, wr%d, wq%d, wf%d, c%d, k%d)",
+            self._client_id,
             (connect_flags & 0x80) >> 7,
             (connect_flags & 0x40) >> 6,
             (connect_flags & 0x20) >> 5,
             (connect_flags & 0x18) >> 3,
             (connect_flags & 0x4) >> 2,
             (connect_flags & 0x2) >> 1,
-            keepalive,
-            self._client_id
+            keepalive
         )
         return self._packet_queue(command, packet, 0, 0)
 
     def _send_disconnect(self):
-        self._easy_log(MQTT_LOG_DEBUG, "Sending DISCONNECT")
+        self._easy_log(MQTT_LOG_DEBUG, "%s: Sending DISCONNECT", self._client_id)
         return self._send_simple_command(DISCONNECT)
 
     def _send_subscribe(self, dup, topics):
@@ -2445,7 +2445,8 @@ class Client(object):
 
         self._easy_log(
             MQTT_LOG_DEBUG,
-            "Sending SUBSCRIBE (d%d, m%d) %s",
+            "%s: Sending SUBSCRIBE (d%d, m%d) %s",
+            self._client_id,
             dup,
             local_mid,
             topics,
@@ -2469,7 +2470,8 @@ class Client(object):
         # topics_repr = ", ".join("'"+topic.decode('utf8')+"'" for topic in topics)
         self._easy_log(
             MQTT_LOG_DEBUG,
-            "Sending UNSUBSCRIBE (d%d, m%d) %s",
+            "%s: Sending UNSUBSCRIBE (d%d, m%d) %s",
+            self._client_id,
             dup,
             local_mid,
             topics,
@@ -2607,14 +2609,14 @@ class Client(object):
             return self._handle_unsuback()
         else:
             # If we don't recognise the command, return an error straight away.
-            self._easy_log(MQTT_LOG_ERR, "Error: Unrecognised command %s", cmd)
+            self._easy_log(MQTT_LOG_ERR, "%s: Error: Unrecognised command %s", self._client_id, cmd)
             return MQTT_ERR_PROTOCOL
 
     def _handle_pingreq(self):
         if self._in_packet['remaining_length'] != 0:
             return MQTT_ERR_PROTOCOL
 
-        self._easy_log(MQTT_LOG_DEBUG, "Received PINGREQ")
+        self._easy_log(MQTT_LOG_DEBUG, "%s: Received PINGREQ", self._client_id)
         return self._send_pingresp()
 
     def _handle_pingresp(self):
@@ -2623,7 +2625,7 @@ class Client(object):
 
         # No longer waiting for a PINGRESP.
         self._ping_t = 0
-        self._easy_log(MQTT_LOG_DEBUG, "Received PINGRESP")
+        self._easy_log(MQTT_LOG_DEBUG, "%s: Received PINGRESP", self._client_id)
         return MQTT_ERR_SUCCESS
 
     def _handle_connack(self):
@@ -2634,8 +2636,8 @@ class Client(object):
         if result == CONNACK_REFUSED_PROTOCOL_VERSION and self._protocol == MQTTv311:
             self._easy_log(
                 MQTT_LOG_DEBUG,
-                "Received CONNACK (%s, %s), attempting downgrade to MQTT v3.1.",
-                flags, result
+                "%s: Received CONNACK (%s, %s), attempting downgrade to MQTT v3.1.",
+                self._client_id, flags, result
             )
             # Downgrade to MQTT v3.1
             self._protocol = MQTTv31
@@ -2644,8 +2646,8 @@ class Client(object):
                 and self._client_id == b''):
             self._easy_log(
                 MQTT_LOG_DEBUG,
-                "Received CONNACK (%s, %s), attempting to use non-empty CID",
-                flags, result,
+                "%s: Received CONNACK (%s, %s), attempting to use non-empty CID",
+                self._client_id, flags, result,
             )
             self._client_id = base62(uuid.uuid4().int, padding=22)
             return self.reconnect()
@@ -2654,7 +2656,7 @@ class Client(object):
             self._state = mqtt_cs_connected
             self._reconnect_delay = None
 
-        self._easy_log(MQTT_LOG_DEBUG, "Received CONNACK (%s, %s)", flags, result)
+        self._easy_log(MQTT_LOG_DEBUG, "%s: Received CONNACK (%s, %s)", self._client_id, flags, result)
 
         with self._callback_mutex:
             if self.on_connect:
@@ -2664,7 +2666,7 @@ class Client(object):
                     try:
                         self.on_connect(self, self._userdata, flags_dict, result)
                     except Exception as err:
-                        self._easy_log(MQTT_LOG_ERR, 'Caught exception in on_connect: %s', err)
+                        self._easy_log(MQTT_LOG_ERR, '%s: Caught exception in on_connect: %s', self._client_id, err)
 
         if result == 0:
             rc = 0
@@ -2733,7 +2735,7 @@ class Client(object):
             return MQTT_ERR_PROTOCOL
 
     def _handle_suback(self):
-        self._easy_log(MQTT_LOG_DEBUG, "Received SUBACK")
+        self._easy_log(MQTT_LOG_DEBUG, "%s: Received SUBACK", self._client_id)
         pack_format = "!H" + str(len(self._in_packet['packet']) - 2) + 's'
         (mid, packet) = struct.unpack(pack_format, self._in_packet['packet'])
         pack_format = "!" + "B" * len(packet)
@@ -2745,7 +2747,7 @@ class Client(object):
                     try:
                         self.on_subscribe(self, self._userdata, mid, granted_qos)
                     except Exception as err:
-                        self._easy_log(MQTT_LOG_ERR, 'Caught exception in on_subscribe: %s', err)
+                        self._easy_log(MQTT_LOG_ERR, '%s: Caught exception in on_subscribe: %s', self._client_id, err)
 
 
         return MQTT_ERR_SUCCESS
@@ -2786,8 +2788,8 @@ class Client(object):
 
         self._easy_log(
             MQTT_LOG_DEBUG,
-            "Received PUBLISH (d%d, q%d, r%d, m%d), '%s', ...  (%d bytes)",
-            message.dup, message.qos, message.retain, message.mid,
+            "%s: Received PUBLISH (d%d, q%d, r%d, m%d), '%s', ...  (%d bytes)",
+            self._client_id, message.dup, message.qos, message.retain, message.mid,
             print_topic, len(message.payload)
         )
 
@@ -2813,7 +2815,7 @@ class Client(object):
             return MQTT_ERR_PROTOCOL
 
         mid, = struct.unpack("!H", self._in_packet['packet'])
-        self._easy_log(MQTT_LOG_DEBUG, "Received PUBREL (Mid: %d)", mid)
+        self._easy_log(MQTT_LOG_DEBUG, "%s: Received PUBREL (Mid: %d)", self._client_id, mid)
 
         with self._in_message_mutex:
             if mid in self._in_messages:
@@ -2865,7 +2867,7 @@ class Client(object):
             return MQTT_ERR_PROTOCOL
 
         mid, = struct.unpack("!H", self._in_packet['packet'])
-        self._easy_log(MQTT_LOG_DEBUG, "Received PUBREC (Mid: %d)", mid)
+        self._easy_log(MQTT_LOG_DEBUG, "%s: Received PUBREC (Mid: %d)", self._client_id, mid)
 
         with self._out_message_mutex:
             if mid in self._out_messages:
@@ -2881,14 +2883,14 @@ class Client(object):
             return MQTT_ERR_PROTOCOL
 
         mid, = struct.unpack("!H", self._in_packet['packet'])
-        self._easy_log(MQTT_LOG_DEBUG, "Received UNSUBACK (Mid: %d)", mid)
+        self._easy_log(MQTT_LOG_DEBUG, "%s: Received UNSUBACK (Mid: %d)", self._client_id, mid)
         with self._callback_mutex:
             if self.on_unsubscribe:
                 with self._in_callback_mutex:
                     try:
                         self.on_unsubscribe(self, self._userdata, mid)
                     except Exception as err:
-                        self._easy_log(MQTT_LOG_ERR, 'Caught exception in on_unsubscribe: %s', err)
+                        self._easy_log(MQTT_LOG_ERR, '%s: Caught exception in on_unsubscribe: %s', self._client_id, err)
         return MQTT_ERR_SUCCESS
 
     def _do_on_publish(self, mid):
@@ -2898,7 +2900,7 @@ class Client(object):
                     try:
                         self.on_publish(self, self._userdata, mid)
                     except Exception as err:
-                        self._easy_log(MQTT_LOG_ERR, 'Caught exception in on_publish: %s', err)
+                        self._easy_log(MQTT_LOG_ERR, '%s: Caught exception in on_publish: %s', self._client_id, err)
 
         msg = self._out_messages.pop(mid)
         msg.info._set_as_published()
@@ -2915,7 +2917,7 @@ class Client(object):
             return MQTT_ERR_PROTOCOL
 
         mid, = struct.unpack("!H", self._in_packet['packet'])
-        self._easy_log(MQTT_LOG_DEBUG, "Received %s (Mid: %d)", cmd, mid)
+        self._easy_log(MQTT_LOG_DEBUG, "%s: Received %s (Mid: %d)", self._client_id, cmd, mid)
 
         with self._out_message_mutex:
             if mid in self._out_messages:
@@ -2944,7 +2946,7 @@ class Client(object):
                     try:
                         self.on_message(self, self._userdata, message)
                     except Exception as err:
-                        self._easy_log(MQTT_LOG_ERR, 'Caught exception in on_message: %s', err)
+                        self._easy_log(MQTT_LOG_ERR, '%s: Caught exception in on_message: %s', self._client_id, err)
 
     def _thread_main(self):
         self.loop_forever(retry_first_connection=True)
